@@ -36,6 +36,10 @@ const Blog = sequelize.define(
       type: DataTypes.STRING,
       allowNull: true,
     },
+    category: {
+      type: DataTypes.ENUM("case-study", "scaling-and-performance", "ai-integration"),
+      allowNull: true,
+    },
     tags: {
       type: DataTypes.JSON,
       allowNull: true,

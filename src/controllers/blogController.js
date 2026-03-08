@@ -7,9 +7,13 @@ const getPublishedBlogs = async (req, res, next) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
-    const { tag, search } = req.query;
+    const { tag, search, category } = req.query;
 
     const where = { status: "published" };
+
+    if (category) {
+      where.category = category;
+    }
 
     if (search) {
       where[Op.or] = [
@@ -20,7 +24,9 @@ const getPublishedBlogs = async (req, res, next) => {
 
     const { count, rows: blogs } = await Blog.findAndCountAll({
       where,
-      include: [{ model: User, as: "author", attributes: ["id", "name", "avatar"] }],
+      include: [
+        { model: User, as: "author", attributes: ["id", "name", "avatar"] },
+      ],
       order: [["publishedAt", "DESC"]],
       limit,
       offset,
@@ -48,7 +54,9 @@ const getBlogBySlug = async (req, res, next) => {
   try {
     const blog = await Blog.findOne({
       where: { slug: req.params.slug, status: "published" },
-      include: [{ model: User, as: "author", attributes: ["id", "name", "avatar"] }],
+      include: [
+        { model: User, as: "author", attributes: ["id", "name", "avatar"] },
+      ],
     });
 
     if (!blog) {
@@ -67,14 +75,17 @@ const getAllBlogs = async (req, res, next) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
-    const { status } = req.query;
+    const { status, category } = req.query;
 
     const where = {};
     if (status) where.status = status;
+    if (category) where.category = category;
 
     const { count, rows: blogs } = await Blog.findAndCountAll({
       where,
-      include: [{ model: User, as: "author", attributes: ["id", "name", "avatar"] }],
+      include: [
+        { model: User, as: "author", attributes: ["id", "name", "avatar"] },
+      ],
       order: [["createdAt", "DESC"]],
       limit,
       offset,
@@ -96,7 +107,9 @@ const getAllBlogs = async (req, res, next) => {
 const getBlog = async (req, res, next) => {
   try {
     const blog = await Blog.findByPk(req.params.id, {
-      include: [{ model: User, as: "author", attributes: ["id", "name", "avatar"] }],
+      include: [
+        { model: User, as: "author", attributes: ["id", "name", "avatar"] },
+      ],
     });
 
     if (!blog) {
@@ -114,10 +127,16 @@ const createBlog = async (req, res, next) => {
     const blog = await Blog.create({ ...req.body, userId: req.user.id });
 
     const created = await Blog.findByPk(blog.id, {
-      include: [{ model: User, as: "author", attributes: ["id", "name", "avatar"] }],
+      include: [
+        { model: User, as: "author", attributes: ["id", "name", "avatar"] },
+      ],
     });
 
-    return ApiResponse.created(res, { blog: created }, "Blog post created successfully");
+    return ApiResponse.created(
+      res,
+      { blog: created },
+      "Blog post created successfully",
+    );
   } catch (error) {
     next(error);
   }
@@ -133,10 +152,16 @@ const updateBlog = async (req, res, next) => {
     await blog.update(req.body);
 
     const updated = await Blog.findByPk(blog.id, {
-      include: [{ model: User, as: "author", attributes: ["id", "name", "avatar"] }],
+      include: [
+        { model: User, as: "author", attributes: ["id", "name", "avatar"] },
+      ],
     });
 
-    return ApiResponse.success(res, { blog: updated }, "Blog post updated successfully");
+    return ApiResponse.success(
+      res,
+      { blog: updated },
+      "Blog post updated successfully",
+    );
   } catch (error) {
     next(error);
   }
