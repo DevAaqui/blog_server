@@ -26,6 +26,12 @@ const DB_HOST =
 
 const DB_PORT = process.env.DB_PORT || process.env.MYSQLPORT || 3306;
 
+console.log('DB_NAME', DB_NAME);
+console.log('DB_USER', DB_USER);
+console.log('DB_PASSWORD', DB_PASSWORD);
+console.log('DB_HOST', DB_HOST);
+console.log('DB_PORT', DB_PORT);
+
 const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
   host: DB_HOST,
   port: DB_PORT,

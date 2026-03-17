@@ -46,6 +46,15 @@ app.use(errorHandler);
 // Start server
 const startServer = async () => {
   try {
+    // Log DB config presence (no values) to debug Railway env issues
+    const dbVars = ["DB_HOST", "DB_PORT", "DB_NAME", "DB_USER", "DB_PASSWORD", "MYSQLHOST", "MYSQLPORT", "MYSQLDATABASE", "MYSQLUSER", "MYSQLPASSWORD"];
+    const present = dbVars.filter((k) => process.env[k]);
+    const missing = dbVars.filter((k) => !process.env[k]);
+    console.log("DB-related env vars set:", present.join(", ") || "(none)");
+    if (missing.length === dbVars.length) {
+      console.error("No DB env vars found. Add MySQL vars to this service or reference the MySQL service.");
+    }
+
     await sequelize.authenticate();
     console.log("Database connected successfully.");
 
@@ -58,6 +67,8 @@ const startServer = async () => {
     });
   } catch (error) {
     console.error("Failed to start server:", error.message);
+    console.error("Full error:", error);
+    if (error.stack) console.error(error.stack);
     process.exit(1);
   }
 };
